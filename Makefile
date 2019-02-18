@@ -889,6 +889,7 @@ KBUILD_LDFLAGS_MODULE += -T scripts/module-lto.lds
 
 # Set O3 optimization level for LTO
 KBUILD_LDFLAGS		+= --plugin-opt=O3
+KBUILD_LDFLAGS      += --lto-O3
 
 # allow disabling only clang LTO where needed
 DISABLE_LTO_CLANG := -fno-lto
