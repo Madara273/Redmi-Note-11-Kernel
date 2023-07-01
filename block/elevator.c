@@ -49,7 +49,7 @@ static LIST_HEAD(elv_list);
 /*
  * Merge hash stuff.
  */
-#define rq_hash_key(rq)		(blk_rq_pos(rq) + blk_rq_sectors(rq))
+#define rq_hash_key(rq) (blk_rq_pos(rq) + blk_rq_sectors(rq))
 
 /*
  * Query io scheduler to see if the current process issuing bio may be
@@ -100,7 +100,7 @@ static struct elevator_type *elevator_find(const char *name, bool mq)
 {
 	struct elevator_type *e;
 
-	list_for_each_entry(e, &elv_list, list) {
+	list_for_each_entry (e, &elv_list, list) {
 		if (elevator_match(e, name) && (mq == e->uses_mq))
 			return e;
 	}
@@ -172,7 +172,7 @@ void __init load_default_elevator_module(void)
 static struct kobj_type elv_ktype;
 
 struct elevator_queue *elevator_alloc(struct request_queue *q,
-				  struct elevator_type *e)
+				      struct elevator_type *e)
 {
 	struct elevator_queue *eq;
 
@@ -221,14 +221,14 @@ int elevator_init(struct request_queue *q)
 		e = elevator_get(q, chosen_elevator, false);
 		if (!e)
 			printk(KERN_ERR "I/O scheduler %s not found\n",
-							chosen_elevator);
+			       chosen_elevator);
 	}
 
 	if (!e)
 		e = elevator_get(q, CONFIG_DEFAULT_IOSCHED, false);
 	if (!e) {
 		printk(KERN_ERR
-			"Default I/O scheduler not found. Using noop.\n");
+		       "Default I/O scheduler not found. Using noop.\n");
 		e = elevator_get(q, "noop", false);
 	}
 
@@ -287,7 +287,7 @@ struct request *elv_rqhash_find(struct request_queue *q, sector_t offset)
 	struct hlist_node *next;
 	struct request *rq;
 
-	hash_for_each_possible_safe(e->hash, rq, next, hash, offset) {
+	hash_for_each_possible_safe (e->hash, rq, next, hash, offset) {
 		BUG_ON(!ELV_ON_HASH(rq));
 
 		if (unlikely(!rq_mergeable(rq))) {
@@ -373,7 +373,7 @@ void elv_dispatch_sort(struct request_queue *q, struct request *rq)
 	q->nr_sorted--;
 
 	boundary = q->end_sector;
-	list_for_each_prev(entry, &q->queue_head) {
+	list_for_each_prev (entry, &q->queue_head) {
 		struct request *pos = list_entry_rq(entry);
 
 		if (req_op(rq) != req_op(pos))
@@ -418,7 +418,7 @@ void elv_dispatch_add_tail(struct request_queue *q, struct request *rq)
 EXPORT_SYMBOL(elv_dispatch_add_tail);
 
 enum elv_merge elv_merge(struct request_queue *q, struct request **req,
-		struct bio *bio)
+			 struct bio *bio)
 {
 	struct elevator_queue *e = q->elevator;
 	struct request *__rq;
@@ -506,7 +506,7 @@ bool elv_attempt_insert_merge(struct request_queue *q, struct request *rq)
 }
 
 void elv_merged_request(struct request_queue *q, struct request *rq,
-		enum elv_merge type)
+			enum elv_merge type)
 {
 	struct elevator_queue *e = q->elevator;
 
@@ -522,7 +522,7 @@ void elv_merged_request(struct request_queue *q, struct request *rq,
 }
 
 void elv_merge_requests(struct request_queue *q, struct request *rq,
-			     struct request *next)
+			struct request *next)
 {
 	struct elevator_queue *e = q->elevator;
 	bool next_sorted = false;
@@ -546,7 +546,7 @@ void elv_merge_requests(struct request_queue *q, struct request *rq,
 }
 
 void elv_bio_merged(struct request_queue *q, struct request *rq,
-			struct bio *bio)
+		    struct bio *bio)
 {
 	struct elevator_queue *e = q->elevator;
 
@@ -571,14 +571,15 @@ static void blk_pm_add_request(struct request_queue *q, struct request *rq)
 {
 	if (q->dev && !(rq->rq_flags & RQF_PM)) {
 		rq->rq_flags |= RQF_PM_ADDED;
-		if (q->nr_pending++ == 0 &&
-		    (q->rpm_status == RPM_SUSPENDED ||
-		     q->rpm_status == RPM_SUSPENDING))
+		if (q->nr_pending++ == 0 && (q->rpm_status == RPM_SUSPENDED ||
+					     q->rpm_status == RPM_SUSPENDING))
 			pm_request_resume(q->dev);
 	}
 }
 #else
-static inline void blk_pm_requeue_request(struct request *rq) {}
+static inline void blk_pm_requeue_request(struct request *rq)
+{
+}
 static inline void blk_pm_add_request(struct request_queue *q,
 				      struct request *rq)
 {
@@ -616,9 +617,9 @@ void elv_drain_elevator(struct request_queue *q)
 
 	while (e->type->ops.sq.elevator_dispatch_fn(q, 1))
 		;
-	if (q->nr_sorted && !blk_queue_is_zoned(q) && printed++ < 10 ) {
+	if (q->nr_sorted && !blk_queue_is_zoned(q) && printed++ < 10) {
 		printk(KERN_ERR "%s: forced dispatching is broken "
-		       "(nr_sorted=%u), please report this\n",
+				"(nr_sorted=%u), please report this\n",
 		       q->elevator->type->elevator_name, q->nr_sorted);
 	}
 }
@@ -638,8 +639,8 @@ void __elv_add_request(struct request_queue *q, struct request *rq, int where)
 			q->boundary_rq = rq;
 		}
 	} else if (!(rq->rq_flags & RQF_ELVPRIV) &&
-		    (where == ELEVATOR_INSERT_SORT ||
-		     where == ELEVATOR_INSERT_SORT_MERGE))
+		   (where == ELEVATOR_INSERT_SORT ||
+		    where == ELEVATOR_INSERT_SORT_MERGE))
 		where = ELEVATOR_INSERT_BACK;
 
 	switch (where) {
@@ -698,8 +699,8 @@ void __elv_add_request(struct request_queue *q, struct request *rq, int where)
 		blk_insert_flush(rq);
 		break;
 	default:
-		printk(KERN_ERR "%s: bad insertion point %d\n",
-		       __func__, where);
+		printk(KERN_ERR "%s: bad insertion point %d\n", __func__,
+		       where);
 		BUG();
 	}
 }
@@ -747,7 +748,8 @@ int elv_set_request(struct request_queue *q, struct request *rq,
 		return 0;
 
 	if (e->type->ops.sq.elevator_set_req_fn)
-		return e->type->ops.sq.elevator_set_req_fn(q, rq, bio, gfp_mask);
+		return e->type->ops.sq.elevator_set_req_fn(q, rq, bio,
+							   gfp_mask);
 	return 0;
 }
 
@@ -795,8 +797,8 @@ void elv_completed_request(struct request_queue *q, struct request *rq)
 
 #define to_elv(atr) container_of((atr), struct elv_fs_entry, attr)
 
-static ssize_t
-elv_attr_show(struct kobject *kobj, struct attribute *attr, char *page)
+static ssize_t elv_attr_show(struct kobject *kobj, struct attribute *attr,
+			     char *page)
 {
 	struct elv_fs_entry *entry = to_elv(attr);
 	struct elevator_queue *e;
@@ -812,9 +814,8 @@ elv_attr_show(struct kobject *kobj, struct attribute *attr, char *page)
 	return error;
 }
 
-static ssize_t
-elv_attr_store(struct kobject *kobj, struct attribute *attr,
-	       const char *page, size_t length)
+static ssize_t elv_attr_store(struct kobject *kobj, struct attribute *attr,
+			      const char *page, size_t length)
 {
 	struct elv_fs_entry *entry = to_elv(attr);
 	struct elevator_queue *e;
@@ -831,13 +832,13 @@ elv_attr_store(struct kobject *kobj, struct attribute *attr,
 }
 
 static const struct sysfs_ops elv_sysfs_ops = {
-	.show	= elv_attr_show,
-	.store	= elv_attr_store,
+	.show = elv_attr_show,
+	.store = elv_attr_store,
 };
 
 static struct kobj_type elv_ktype = {
-	.sysfs_ops	= &elv_sysfs_ops,
-	.release	= elevator_release,
+	.sysfs_ops = &elv_sysfs_ops,
+	.release = elevator_release,
 };
 
 int elv_register_queue(struct request_queue *q)
@@ -910,12 +911,11 @@ int elv_register(struct elevator_type *e)
 
 	/* print pretty message */
 	if (elevator_match(e, chosen_elevator) ||
-			(!*chosen_elevator &&
-			 elevator_match(e, CONFIG_DEFAULT_IOSCHED)))
-				def = " (default)";
+	    (!*chosen_elevator && elevator_match(e, CONFIG_DEFAULT_IOSCHED)))
+		def = " (default)";
 
 	printk(KERN_INFO "io scheduler %s registered%s\n", e->elevator_name,
-								def);
+	       def);
 	return 0;
 }
 EXPORT_SYMBOL_GPL(elv_register);
@@ -939,8 +939,7 @@ void elv_unregister(struct elevator_type *e)
 }
 EXPORT_SYMBOL_GPL(elv_unregister);
 
-int elevator_switch_mq(struct request_queue *q,
-			      struct elevator_type *new_e)
+int elevator_switch_mq(struct request_queue *q, struct elevator_type *new_e)
 {
 	int ret;
 
@@ -991,7 +990,13 @@ int elevator_init_mq(struct request_queue *q)
 
 	if (unlikely(q->elevator))
 		goto out;
-	if (IS_ENABLED(CONFIG_IOSCHED_BFQ)) {
+
+	if (IS_ENABLED(CONFIG_FORCE_MQ_FRAMEWORK) &&
+	    IS_ENABLED(CONFIG_MQ_IOSCHED_SSG)) {
+		e = elevator_get(q, "ssg", false);
+		if (!e)
+			goto out;
+	} else if (IS_ENABLED(CONFIG_IOSCHED_BFQ)) {
 		e = elevator_get(q, "bfq", false);
 		if (!e)
 			goto out;
@@ -1006,7 +1011,6 @@ int elevator_init_mq(struct request_queue *q)
 out:
 	return err;
 }
-
 
 /*
  * switch to new_e io scheduler. be careful not to introduce deadlocks -
@@ -1118,8 +1122,7 @@ static int __elevator_change(struct request_queue *q, const char *name)
 
 static inline bool elv_support_iosched(struct request_queue *q)
 {
-	if (q->mq_ops && q->tag_set && (q->tag_set->flags &
-				BLK_MQ_F_NO_SCHED))
+	if (q->mq_ops && q->tag_set && (q->tag_set->flags & BLK_MQ_F_NO_SCHED))
 		return false;
 	return true;
 }
@@ -1151,28 +1154,28 @@ ssize_t elv_iosched_show(struct request_queue *q, char *name)
 		return sprintf(name, "none\n");
 
 	if (!q->elevator)
-		len += sprintf(name+len, "[none] ");
+		len += sprintf(name + len, "[none] ");
 	else
 		elv = e->type;
 
 	spin_lock(&elv_list_lock);
-	list_for_each_entry(__e, &elv_list, list) {
+	list_for_each_entry (__e, &elv_list, list) {
 		if (elv && elevator_match(elv, __e->elevator_name) &&
 		    (__e->uses_mq == uses_mq)) {
-			len += sprintf(name+len, "[%s] ", elv->elevator_name);
+			len += sprintf(name + len, "[%s] ", elv->elevator_name);
 			continue;
 		}
 		if (__e->uses_mq && q->mq_ops && elv_support_iosched(q))
-			len += sprintf(name+len, "%s ", __e->elevator_name);
+			len += sprintf(name + len, "%s ", __e->elevator_name);
 		else if (!__e->uses_mq && !q->mq_ops)
-			len += sprintf(name+len, "%s ", __e->elevator_name);
+			len += sprintf(name + len, "%s ", __e->elevator_name);
 	}
 	spin_unlock(&elv_list_lock);
 
 	if (q->mq_ops && q->elevator)
-		len += sprintf(name+len, "none");
+		len += sprintf(name + len, "none");
 
-	len += sprintf(len+name, "\n");
+	len += sprintf(len + name, "\n");
 	return len;
 }
 
