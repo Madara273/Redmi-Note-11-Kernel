@@ -70,3 +70,13 @@ obj-$(CONFIG_FB_MSM_MDSS_WRITEBACK) += mdss_wb.o
 
 obj-$(CONFIG_FB_MSM_MDSS) += mdss_fb.o mdss_util.o
 obj-$(CONFIG_COMPAT) += mdss_compat_utils.o
+
+
+obj-$(CONFIG_FB_MSM_MDSS_KCAL_CTRL) += mdss_mdp_kcal_ctrl.o
+
+# TODO: remove me b/62058353
+subdir-ccflags-y += \
+	-Wno-header-guard \
+	-Wno-parentheses-equality \
+	-Wno-duplicate-decl-specifier
+	
