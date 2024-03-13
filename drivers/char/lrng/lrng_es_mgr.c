@@ -11,7 +11,6 @@
 #include <linux/random.h>
 #include <linux/utsname.h>
 #include <linux/workqueue.h>
-#include <asm/archrandom.h>
 
 #ifdef CONFIG_VDSO_GETRANDOM
 #include <vdso/getrandom.h>
