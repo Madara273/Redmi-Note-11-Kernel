@@ -47,7 +47,7 @@ dsi_k7_38_0c_0a_video:
 		qcom,mdss-dsi-te-using-te-pin;
 		qcom,mdss-dsi-pan-enable-dynamic-fps;
 		qcom,mdss-dsi-pan-fps-update = "dfps_immediate_porch_mode_vfp";
-		qcom,dsi-supported-dfps-list = <90 60>;
+		qcom,dsi-supported-dfps-list = <92 60>;
 		qcom,esd-err-irq-gpio = <&tlmm 99 0x2001>;
 		qcom,esd-check-enabled;
 		qcom,mdss-dsi-panel-status-check-mode = "reg_read";
@@ -66,7 +66,7 @@ dsi_k7_38_0c_0a_video:
 			timing@0 {
 				qcom,mdss-dsi-panel-width = <1080>;
 				qcom,mdss-dsi-panel-height = <2400>;
-				qcom,mdss-dsi-panel-framerate = <90>;
+				qcom,mdss-dsi-panel-framerate = <92>;
 				qcom,mdss-dsi-h-pulse-width = <32>;
 				qcom,mdss-dsi-h-back-porch = <120>;
 				qcom,mdss-dsi-h-front-porch = <320>;
