@@ -200,7 +200,6 @@ static void gre_err(struct sk_buff *skb, u32 info)
 	const struct gre_protocol *proto;
 	const struct iphdr *iph = (const struct iphdr *)skb->data;
 	u8 ver;
-	int err = 0;
 
 	if (skb->data[(iph->ihl<<2) + 0] == 0x20 &&
 		skb->data[(iph->ihl<<2) + 1] == 0x01 &&
@@ -211,7 +210,7 @@ static void gre_err(struct sk_buff *skb, u32 info)
 	else {
 		ver = skb->data[(iph->ihl<<2) + 1]&0x7f;
 		if (ver >= GREPROTO_MAX)
-			return -EINVAL;
+			return;
 	}
 
 	rcu_read_lock();
