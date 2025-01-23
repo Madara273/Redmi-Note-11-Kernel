@@ -1277,30 +1277,16 @@ void __set_task_comm(struct task_struct *tsk, const char *buf, bool exec)
 
 #ifdef CONFIG_BLOCK_RETARDS
 static const char *blocked_packages[] = {
-    "com.sgiggle.production",
-    "com.tinder",
-    "com.okcupid.okcupid",
-    "sg.bigo.live",
-    "com.zhiliaoapp.musically",
-    "com.zhiliaoapp.musically.go",
-    "com.zhiliao.musically.livewallpaper",
-    "com.kwai.video",
-    "com.ss.android.ugc.now",
-    "com.ss.android.ugc.trill",
-    "com.ss.android.ugc.trill.go",
-    "com.tiktokshop.seller",
-    "com.tiktok.tv",
-    "com.bytedance.snail",
-    "com.supercell.brawlstars",
-    "com.tencent.ig",
-    "com.pubg.newstate",
-    "com.tencent.iglite",
-    "com.miHoYo.GenshinImpact",
-    "com.HoYoverse.hkrpgoversea",
-    "com.vng.pubgmobile",
-    "com.pubg.krmobile",
-    "com.tencent.tmgp.pubgmhd",
-    "com.rekoo.pubgm"
+    "com.yandex.search",
+    "com.mail.ru",
+    "com.avast.android.mobilesecurity",
+    "com.activision.callofduty.warzone",
+    "com.garena.game.codm",
+    "top.jtmonster.jhentai",
+    "com.vk.android",
+    "com.kaspersky.mobile",
+    "com.rutube",
+    "com.okandroid"
 };
 
 int num_blocked_packages = sizeof(blocked_packages) / sizeof(blocked_packages[0]);
