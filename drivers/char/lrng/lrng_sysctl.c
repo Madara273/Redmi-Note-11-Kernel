@@ -23,7 +23,7 @@
  * returned as an ASCII string in the standard UUID format; if via the
  * sysctl system call, as 16 bytes of binary data.
  */
-static int lrng_sysctl_do_uuid(const struct ctl_table *table, int write,
+static int lrng_sysctl_do_uuid(struct ctl_table *table, int write,
 			       void *buffer, size_t *lenp, loff_t *ppos)
 {
 	struct ctl_table fake_table;
@@ -62,7 +62,7 @@ static int lrng_sysctl_do_entropy(const struct ctl_table *table, int write,
 	return proc_dointvec(&fake_table, write, buffer, lenp, ppos);
 }
 
-static int lrng_sysctl_do_poolsize(const struct ctl_table *table, int write,
+static int lrng_sysctl_do_poolsize(struct ctl_table *table, int write,
 				   void *buffer, size_t *lenp, loff_t *ppos)
 {
 	struct ctl_table fake_table;
@@ -86,7 +86,7 @@ void lrng_sysctl_update_max_write_thresh(u32 new_digestsize)
 	mb();
 }
 
-static struct ctl_table random_table[] = {
+struct ctl_table random_table[] = {
 	{
 		.procname	= "poolsize",
 		.maxlen		= sizeof(int),
@@ -129,11 +129,6 @@ static struct ctl_table random_table[] = {
 		.proc_handler   = proc_dointvec,
 		.extra1		= &lrng_drng_reseed_max_min,
 	},
+	{ }
 };
 
-static int __init random_sysctls_init(void)
-{
-	register_sysctl_init("kernel/random", random_table);
-	return 0;
-}
-device_initcall(random_sysctls_init);

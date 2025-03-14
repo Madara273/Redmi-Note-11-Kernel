@@ -10,7 +10,7 @@
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 
 #include <linux/lrng.h>
-#include <crypto/sha1.h>
+#include <crypto/sha.h>
 #include <crypto/sha1_base.h>
 
 #include "lrng_sha.h"
@@ -30,7 +30,7 @@ static void lrng_sha1_block_fn(struct sha1_state *sctx, const u8 *src,
 	u32 temp[SHA1_WORKSPACE_WORDS];
 
 	while (blocks--) {
-		sha1_transform(sctx->state, src, temp);
+		sha_transform(sctx->state, src, temp);
 		src += SHA1_BLOCK_SIZE;
 	}
 	memzero_explicit(temp, sizeof(temp));
