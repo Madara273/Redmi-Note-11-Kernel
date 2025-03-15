@@ -5661,6 +5661,7 @@ enqueue_task_fair(struct rq *rq, struct task_struct *p, int flags)
 		cpufreq_update_util(rq, SCHED_CPUFREQ_IOWAIT);
 
 #ifdef CONFIG_SCHED_BORE
+	int task_sleep = flags & DEQUEUE_SLEEP;
 	if (task_sleep) {
 		cfs_rq = cfs_rq_of(se);
 		if (cfs_rq->curr == se)
