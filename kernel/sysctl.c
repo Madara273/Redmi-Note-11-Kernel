@@ -129,7 +129,6 @@ static int __maybe_unused neg_three = -3;
 static int zero;
 static int __maybe_unused one = 1;
 static int __maybe_unused two = 2;
-static int __maybe_unused three = 3;
 static int __maybe_unused four = 4;
 static int int_max = INT_MAX;
 static unsigned long zero_ul;
