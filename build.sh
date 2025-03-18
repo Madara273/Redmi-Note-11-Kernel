@@ -234,7 +234,7 @@ clone_anykernel3(){
         # Set timeout for user input (5 seconds)
         read -t 5 -rp "Enter your choice (1, 2, or 3): " choice
 
-        # If no input is provided within 5 seconds, default to action 1 (ElectraX)
+        # If no input is provided within 5 seconds, default to action 1 (Neutrino)
         [ -z "$choice" ] && echo -e "${YELLOW}No input detected. Automatically selecting Neutrino.${NC}" && choice=1
 
         case $choice in
@@ -391,9 +391,9 @@ generate_flashable(){
 
     cd $ANYKERNEL_PATH || { echo -e "${RED}Failed to enter $ANYKERNEL_PATH directory.${NC}"; exit 1; }
 
-    zip -q -r ElectraX-$CLEAN_TIME.zip * -x "README.md" "changelog.txt"  "defconfig" "kernel-changelog.txt" "build.log" || { echo -e "${RED}Failed to pack flashable kernel.${NC}"; exit 1; }
+    zip -q -r Neutrino-$CLEAN_TIME.zip * -x "README.md" "changelog.txt"  "defconfig" "kernel-changelog.txt" "build.log" || { echo -e "${RED}Failed to pack flashable kernel.${NC}"; exit 1; }
 
-    echo -e "${YELLOW} Target file: $TARGET_OUT/$ANYKERNEL_PATH/ElectraX-$CLEAN_TIME.zip ${NC}"
+    echo -e "${YELLOW} Target file: $TARGET_OUT/$ANYKERNEL_PATH/Neutrino-$CLEAN_TIME.zip ${NC}"
 
     cd $KERNEL_DIR
 }
