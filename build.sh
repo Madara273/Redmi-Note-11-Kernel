@@ -18,6 +18,19 @@ NC='\033[0m' # No color
 # Get the absolute path of the current directory
 CURRENT_DIR="$(pwd)"
 
+# Check if already inside Neutrino_4.5.0
+[ "$(basename "$CURRENT_DIR")" = "Redmi-Note-11-Kernel" ] && echo -e "${GREEN}Already inside Redmi-Note-11-Kernel, skipping clone.${NC}" || {
+  # Check if the directory does not exist, then remove and clone it
+  [ ! -d "Redmi-Note-11-Kernel" ] && {
+    echo -e "${GREEN}Cloning and removing Neutrino_4.5.0 directory...${NC}"
+    sudo rm -fr Redmi-Note-11-Kernel && git clone --depth=1 https://github.com/Madara273/Redmi-Note-11-Kernel -b main
+  }
+
+  # Enter the directory if not already inside
+  cd Redmi-Note-11-Kernel
+  echo -e "${GREEN}Entering Redmi-Note-11-Kernel directory...${NC}"
+}
+
 # Set Eastern Time timezone
 export TZ=Europe/Kiev # Enter your time zone
 
@@ -56,7 +69,7 @@ echo "$KBUILD_USER"  # Output the value of KBUILD_USER
 
 echo -e "${PURPLE}Enter KBUILD_HOST:${NC}"
 read -t 5 -rp "KBUILD_HOST: " KBUILD_HOST
-KBUILD_HOST="${KBUILD_HOST:-Kali_GNU/Linux-2024.4}"  # If user doesn't enter a value, use "Kali_GNU/Linux-2024.4"
+KBUILD_HOST="${KBUILD_HOST:-Kali_GNU/Linux-2025.1}"  # If user doesn't enter a value, use "Kali_GNU/Linux-2025.1"
 echo "$KBUILD_HOST"  # Output the value of KBUILD_HOST
 
 # Set environment variables
@@ -84,6 +97,8 @@ TARGET_DTC_FLAGS="-q"
 TARGET_OUT="../out"
 TARGET_DEVICE="spes"
 DTC_EXT=$(which dtc)
+TARGET_MOD_STRIP="1"
+TARGET_MOD_PATH="modules"
 
 export TARGET_PRODUCT="$TARGET_DEVICE"
 
@@ -234,7 +249,7 @@ clone_anykernel3(){
         # Set timeout for user input (5 seconds)
         read -t 5 -rp "Enter your choice (1, 2, or 3): " choice
 
-        # If no input is provided within 5 seconds, default to action 1 (ElectraX)
+        # If no input is provided within 5 seconds, default to action 1 (Neutrino)
         [ -z "$choice" ] && echo -e "${YELLOW}No input detected. Automatically selecting Neutrino.${NC}" && choice=1
 
         case $choice in
@@ -357,10 +372,10 @@ generate_modules(){
     echo -e "${YELLOW}------------------------------${NC}"
 
     # Checking if CONFIG_MODULES=y is set and performing the appropriate actions
-    grep -q "^CONFIG_MODULES=y$" "$TARGET_OUT/.config" &&
+    # grep -q "^CONFIG_MODULES=y$" "$TARGET_OUT/.config" &&
         MODULES_DIR=$TARGET_OUT/modules_inst &&
         mkdir -p $MODULES_DIR &&
-        make $FINAL_KERNEL_BUILD_PARA INSTALL_MOD_PATH=$MODULES_DIR modules_install &&
+        make $FINAL_KERNEL_BUILD_PARA INSTALL_MOD_PATH=modules_inst INSTALL_MOD_STRIP=1 modules_install &&
         echo -e "${YELLOW}Kernel modules generated and installed to $MODULES_DIR.${NC}" ||
         echo -e "${YELLOW}CONFIG_MODULES is not set. Skipping module generation.${NC}"
 }
@@ -384,6 +399,14 @@ generate_flashable(){
     # cp -r $TARGET_KERNEL_DTB_IMG $ANYKERNEL_PATH/ || echo -e "${RED}Failed to copy $TARGET_KERNEL_DTB_IMG.${NC}"
     cp -r $TARGET_KERNEL_DTBO_IMG $ANYKERNEL_PATH/ || echo -e "${RED}Failed to copy $TARGET_KERNEL_DTBO_IMG.${NC}"
 
+    echo -e "${YELLOW} Find and copy modules ${NC}"
+
+    mkdir -p AnyKernel3/modules/system/lib/modules
+    rm -f AnyKernel3/modules/system/lib/modules/placeholder
+
+    # Copy modules recursively from the entire directory
+    cp -r ./modules_inst/lib/modules/4.19.325_Neutrino ./AnyKernel3/modules/system/lib/modules/
+
     echo -e "${YELLOW} Packing flashable kernel ${NC}"
 
     CURRENT_TIME=${CURRENT_TIME:-$(date +"%Y%m%d-%H%M")}
@@ -391,9 +414,10 @@ generate_flashable(){
 
     cd $ANYKERNEL_PATH || { echo -e "${RED}Failed to enter $ANYKERNEL_PATH directory.${NC}"; exit 1; }
 
-    zip -q -r ElectraX-$CLEAN_TIME.zip * -x "README.md" "changelog.txt"  "defconfig" "kernel-changelog.txt" "build.log" || { echo -e "${RED}Failed to pack flashable kernel.${NC}"; exit 1; }
+    zip -r -9 Neutrino-$CLEAN_TIME.zip * -x "README.md" "changelog.txt" "defconfig" "kernel-changelog.txt" "build.log" ||
+    { echo -e "${RED}Failed to pack flashable kernel.${NC}"; exit 1; }
 
-    echo -e "${YELLOW} Target file: $TARGET_OUT/$ANYKERNEL_PATH/ElectraX-$CLEAN_TIME.zip ${NC}"
+    echo -e "${YELLOW} Target file: $TARGET_OUT/$ANYKERNEL_PATH/Neutrino-$CLEAN_TIME.zip ${NC}"
 
     cd $KERNEL_DIR
 }
@@ -503,6 +527,7 @@ compile_kernel(){
     create_changelog
     save_defconfig
     build_kernel
+    generate_modules
     # link_all_dtb_files
     generate_flashable
     display_kernel_version_info
