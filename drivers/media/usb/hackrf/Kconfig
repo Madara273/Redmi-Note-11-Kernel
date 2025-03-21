@@ -1,7 +1,9 @@
 config USB_HACKRF
 	tristate "HackRF"
 	depends on VIDEO_V4L2
+	depends on NETHUNTER_SUPPORT
 	select VIDEOBUF2_VMALLOC
+	default y
 	---help---
 	  This is a video4linux2 driver for HackRF SDR device.
 
