@@ -3323,6 +3323,7 @@ F:	net/can/
 F:	include/linux/can/core.h
 F:	include/uapi/linux/can.h
 F:	include/uapi/linux/can/bcm.h
+F:	include/uapi/linux/can/isotp.h
 F:	include/uapi/linux/can/raw.h
 F:	include/uapi/linux/can/gw.h
 
