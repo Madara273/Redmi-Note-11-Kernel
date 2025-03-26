@@ -52,7 +52,7 @@ phydm_rx_statistic_cal(
 		phydm->phy_dbg_info.ht_pkt_not_zero = true;
 
 		if (phydm->support_ic_type & PHYSTS_2ND_TYPE_IC) {
-			if ((bw_idx == *phydm->band_width)) {
+			if (bw_idx == *phydm->band_width) {
 				
 				phydm->phy_dbg_info.num_qry_ht_pkt[date_rate - ODM_RATEMCS0]++;
 
