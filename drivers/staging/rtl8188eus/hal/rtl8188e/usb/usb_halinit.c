@@ -284,7 +284,7 @@ _InitInterrupt(
 	/* 1; Use bulk endpoint to upload interrupt pkt,	 */
 	usb_opt = rtw_read8(Adapter, REG_USB_SPECIAL_OPTION);
 
-	if ((IS_FULL_SPEED_USB(Adapter))
+	if (IS_FULL_SPEED_USB(Adapter)
 #ifdef CONFIG_USB_INTERRUPT_IN_PIPE
 	    || (pdev->RtInPipe[REALTEK_USB_IN_INT_EP_IDX] == 0x05)
 #endif
