@@ -1596,8 +1596,8 @@ static int isotp_init(struct sock *sk)
 	return 0;
 }
 
-static int isotp_sock_no_ioctlcmd(struct socket *sock, unsigned int cmd,
-				  unsigned long arg)
+static int __maybe_unused isotp_sock_no_ioctlcmd(struct socket *sock, unsigned int cmd,
+				unsigned long arg)
 {
 	/* no ioctls for socket layer -> hand it down to NIC layer */
 	return -ENOIOCTLCMD;
