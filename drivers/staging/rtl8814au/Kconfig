@@ -1,6 +1,8 @@
 config RTL8814AU
 	tristate "Realtek 8814A USB WiFi"
 	depends on USB
+	depends on NETHUNTER_SUPPORT
+	default m
 	help
 	  Help message of RTL8814AU
 
