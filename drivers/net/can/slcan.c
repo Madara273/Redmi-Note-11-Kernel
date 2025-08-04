@@ -704,15 +704,27 @@ static struct tty_ldisc_ops slc_ldisc = {
 	.write_wakeup	= slcan_write_wakeup,
 };
 
-static int __init slcan_init(void)
+/*
+ * slcan_do_init - Initializes the slcan serial CAN driver.
+ * Checks the current CAN mode, allocates memory for device structures,
+ * registers the slcan line discipline, ensures a minimum channel count,
+ * and prepares the driver for operation.
+ */
+int slcan_do_init(void)
 {
-	int status;
+	extern int can_mode;
+	int status = 0;
+
+	if (can_mode != 0) {
+		pr_info("slcan: init skipped due to mode %d\n", can_mode);
+		return 0;
+	}
 
 	if (maxdev < 4)
 		maxdev = 4; /* Sanity */
 
 	pr_info("slcan: serial line CAN interface driver\n");
-	pr_info("slcan: %d dynamic interface channels.\n", maxdev);
+	pr_info("slcan: %d dynamic interface channels\n", maxdev);
 
 	slcan_devs = kcalloc(maxdev, sizeof(struct net_device *), GFP_KERNEL);
 	if (!slcan_devs)
@@ -720,14 +732,22 @@ static int __init slcan_init(void)
 
 	/* Fill in our line protocol discipline, and register it */
 	status = tty_register_ldisc(N_SLCAN, &slc_ldisc);
-	if (status)  {
-		printk(KERN_ERR "slcan: can't register line discipline\n");
+	if (status) {
+		pr_err("slcan: can't register line discipline (err %d)\n", status);
 		kfree(slcan_devs);
+		slcan_devs = NULL;
 	}
+
 	return status;
 }
 
-static void __exit slcan_exit(void)
+/*
+ * slcan_do_exit - Shuts down and cleans up the slcan serial CAN driver.
+ * Hangs up any active tty connections, unregisters CAN network devices,
+ * frees allocated memory, and unregisters the slcan line discipline.
+ * Ensures a proper shutdown even if devices are still asynchronously closing.
+ */
+void slcan_do_exit(void)
 {
 	int i;
 	struct net_device *dev;
@@ -749,6 +769,7 @@ static void __exit slcan_exit(void)
 			dev = slcan_devs[i];
 			if (!dev)
 				continue;
+
 			sl = netdev_priv(dev);
 			spin_lock_bh(&sl->lock);
 			if (sl->tty) {
@@ -766,12 +787,12 @@ static void __exit slcan_exit(void)
 		dev = slcan_devs[i];
 		if (!dev)
 			continue;
-		slcan_devs[i] = NULL;
 
+		slcan_devs[i] = NULL;
 		sl = netdev_priv(dev);
+
 		if (sl->tty) {
-			printk(KERN_ERR "%s: tty discipline still running\n",
-			       dev->name);
+			pr_err("%s: tty discipline still running\n", dev->name);
 		}
 
 		unregister_netdev(dev);
@@ -780,10 +801,8 @@ static void __exit slcan_exit(void)
 	kfree(slcan_devs);
 	slcan_devs = NULL;
 
+	/* Unregister the line discipline */
 	i = tty_unregister_ldisc(N_SLCAN);
 	if (i)
-		printk(KERN_ERR "slcan: can't unregister ldisc (err %d)\n", i);
+		pr_err("slcan: can't unregister ldisc (err %d)\n", i);
 }
-
-module_init(slcan_init);
-module_exit(slcan_exit);

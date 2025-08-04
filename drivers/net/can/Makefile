@@ -14,6 +14,8 @@ obj-y				+= usb/
 obj-y				+= usb-can-2/
 obj-y				+= softing/
 
+obj-y				+= can_switch.o
+
 obj-$(CONFIG_CAN_AT91)		+= at91_can.o
 obj-$(CONFIG_CAN_CAN327)	+= can327.o
 obj-$(CONFIG_CAN_CC770)		+= cc770/
