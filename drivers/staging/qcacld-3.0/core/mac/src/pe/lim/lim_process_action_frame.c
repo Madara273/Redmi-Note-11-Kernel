@@ -55,6 +55,10 @@
 
 static last_processed_msg rrm_link_action_frm;
 
+enum lim_public_action_code {
+	LIM_PUBLIC_ACTION_FILS_DISCOVERY = 34,
+};
+
 /**-----------------------------------------------------------------
    \fn     lim_stop_tx_and_switch_channel
    \brief  Stops the transmission if channel switch mode is silent and
@@ -1967,6 +1971,23 @@ void lim_process_action_frame(struct mac_context *mac_ctx,
 					(uint8_t *) mac_hdr,
 					frame_len + sizeof(tSirMacMgmtHdr),
 					session->smeSessionId,
+					wlan_reg_legacy_chan_to_freq(mac_ctx->pdev, WMA_GET_RX_CH(rx_pkt_info)), session,
+						WMA_GET_RX_RSSI_NORMALIZED(
+						rx_pkt_info), RXMGMT_FLAG_NONE);
+				break;
+		case LIM_PUBLIC_ACTION_FILS_DISCOVERY:
+			if (LIM_IS_STA_ROLE(session) ||
+			    LIM_IS_AP_ROLE(session)) {
+				/* FILS discovery frames are not expected in STA/AP mode. */
+				pe_err_rl("Do not forward FILS discovery in AP/STA mode");
+				break;
+			}
+			lim_send_sme_mgmt_frame_ind(mac_ctx,
+					mac_hdr->fc.subType,
+					(uint8_t *)mac_hdr,
+					frame_len + sizeof(tSirMacMgmtHdr),
+					session->smeSessionId,
+
 					WMA_GET_RX_CH(rx_pkt_info),
 					session, rssi, RXMGMT_FLAG_NONE);
 			break;
@@ -2256,6 +2277,9 @@ void lim_process_action_frame_no_session(struct mac_context *mac, uint8_t *pBd)
 	uint8_t dpp_oui[] = { 0x50, 0x6F, 0x9A, 0x1A };
 	tpSirMacActionFrameHdr action_hdr = (tpSirMacActionFrameHdr) pBody;
 	tpSirMacVendorSpecificPublicActionFrameHdr vendor_specific;
+	struct wlan_objmgr_vdev *vdev;
+	enum QDF_OPMODE mode;
+	uint8_t pdev_id;
 
 	pe_debug("Received an Action frame -- no session");
 
@@ -2296,14 +2320,44 @@ void lim_process_action_frame_no_session(struct mac_context *mac, uint8_t *pBd)
 		case SIR_MAC_ACTION_GAS_COMEBACK_REQUEST:
 		case SIR_MAC_ACTION_GAS_COMEBACK_RESPONSE:
 			/*
-			 * Forward the GAS frames to  wpa_supplicant
+			 * Forward the GAS frames to wpa_supplicant
 			 * type is ACTION
 			 */
 			lim_send_sme_mgmt_frame_ind(mac,
 					mac_hdr->fc.subType,
 					(uint8_t *) mac_hdr,
-					frame_len + sizeof(tSirMacMgmtHdr), 0,
-					WMA_GET_RX_CH(pBd), NULL,
+					frame_len + sizeof(tSirMacMgmtHdr),
+					0,
+					wlan_reg_legacy_chan_to_freq(mac->pdev, WMA_GET_RX_CH(pBd)),
+					NULL,
+					WMA_GET_RX_RSSI_NORMALIZED(pBd),
+					RXMGMT_FLAG_NONE);
+			break;
+		case LIM_PUBLIC_ACTION_FILS_DISCOVERY:
+			pdev_id = wlan_objmgr_pdev_get_pdev_id(mac->pdev);
+			vdev = wlan_objmgr_get_vdev_by_macaddr_from_psoc(
+					mac->psoc, pdev_id, mac_hdr->bssId,
+					WLAN_LEGACY_MAC_ID);
+			if (!vdev)
+				vdev = wlan_objmgr_get_vdev_by_id_from_psoc(
+						mac->psoc, 0, WLAN_LEGACY_MAC_ID);
+			if (vdev) {
+				mode = wlan_vdev_mlme_get_opmode(vdev);
+				wlan_objmgr_vdev_release_ref(vdev,
+						WLAN_LEGACY_MAC_ID);
+				if (mode == QDF_STA_MODE ||
+				    mode == QDF_SAP_MODE) {
+					pe_err_rl("Do not forward FILS discovery in AP/STA mode with no session");
+					break;
+				}
+			}
+			lim_send_sme_mgmt_frame_ind(mac,
+					mac_hdr->fc.subType,
+					(uint8_t *)mac_hdr,
+					frame_len + sizeof(tSirMacMgmtHdr),
+					0,
+					wlan_reg_legacy_chan_to_freq(mac->pdev, WMA_GET_RX_CH(pBd)),
+					NULL,
 					WMA_GET_RX_RSSI_NORMALIZED(pBd),
 					RXMGMT_FLAG_NONE);
 			break;
@@ -2320,3 +2374,4 @@ void lim_process_action_frame_no_session(struct mac_context *mac, uint8_t *pBd)
 
 	}
 }
+

@@ -99,6 +99,10 @@
 #endif
 #include "wlan_hdd_he.h"
 
+#ifdef FEATURE_FRAME_INJECTION_SUPPORT
+#include "wlan_hdd_frame_inject.h"
+#endif
+
 #include <net/neighbour.h>
 #include <net/netevent.h>
 #include "wlan_hdd_nud_tracking.h"
@@ -709,6 +713,7 @@ struct hdd_mon_set_ch_info {
 	uint8_t channel;
 	uint8_t cb_mode;
 	uint32_t channel_width;
+	uint32_t freq;
 	eCsrPhyMode phy_mode;
 };
 
@@ -1179,6 +1184,7 @@ struct hdd_adapter {
 	 * will always be in mapped memory
 	 */
 	uint32_t magic;
+	uint32_t mon_chan_freq;
 
 	/* list node for membership in the adapter list */
 	qdf_list_node_t node;
@@ -1447,6 +1453,9 @@ struct hdd_adapter {
 	qdf_mutex_t sta_periodic_stats_lock;
 #endif /* WLAN_FEATURE_PERIODIC_STA_STATS */
 	qdf_event_t peer_cleanup_done;
+#ifdef FEATURE_FRAME_INJECTION_SUPPORT
+	struct hdd_injection_ctx *injection_ctx;
+#endif
 };
 
 #define WLAN_HDD_GET_STATION_CTX_PTR(adapter) (&(adapter)->session.station)

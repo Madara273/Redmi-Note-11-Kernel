@@ -157,11 +157,18 @@ uint32_t ol_tx_get_total_free_desc(struct ol_txrx_pdev_t *pdev)
  */
 void ol_tx_register_flow_control(struct ol_txrx_pdev_t *pdev)
 {
+	uint8_t mgmt_over_wmi;
+
 	qdf_spinlock_create(&pdev->tx_desc.flow_pool_list_lock);
 	TAILQ_INIT(&pdev->tx_desc.flow_pool_list);
 
-	if (!ol_tx_get_is_mgmt_over_wmi_enabled())
-		ol_tx_register_global_mgmt_pool(pdev);
+	mgmt_over_wmi = ol_tx_get_is_mgmt_over_wmi_enabled();
+
+	/*
+	 * Keep a global mgmt pool even when mgmt-over-WMI is enabled so the
+	 * legacy cdp_mgmt_send_ext fallback can still allocate descriptors.
+	 */
+	ol_tx_register_global_mgmt_pool(pdev);
 }
 
 /**
@@ -175,8 +182,7 @@ void ol_tx_deregister_flow_control(struct ol_txrx_pdev_t *pdev)
 	int i = 0;
 	struct ol_tx_flow_pool_t *pool = NULL;
 
-	if (!ol_tx_get_is_mgmt_over_wmi_enabled())
-		ol_tx_deregister_global_mgmt_pool(pdev);
+	ol_tx_deregister_global_mgmt_pool(pdev);
 
 	qdf_spin_lock_bh(&pdev->tx_desc.flow_pool_list_lock);
 	while (!TAILQ_EMPTY(&pdev->tx_desc.flow_pool_list)) {

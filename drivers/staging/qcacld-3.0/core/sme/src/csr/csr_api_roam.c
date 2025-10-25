@@ -17993,6 +17993,10 @@ void csr_get_vdev_type_nss(struct mac_context *mac_ctx,
 		*nss_2g = mac_ctx->vdev_type_nss_2g.sta;
 		*nss_5g = mac_ctx->vdev_type_nss_5g.sta;
 		break;
+	case QDF_MONITOR_MODE:
+		*nss_2g = mac_ctx->vdev_type_nss_2g.sta;
+		*nss_5g = mac_ctx->vdev_type_nss_5g.sta;
+		break;
 	case QDF_SAP_MODE:
 		*nss_2g = mac_ctx->vdev_type_nss_2g.sap;
 		*nss_5g = mac_ctx->vdev_type_nss_5g.sap;
