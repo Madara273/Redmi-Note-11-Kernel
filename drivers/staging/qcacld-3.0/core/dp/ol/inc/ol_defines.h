@@ -22,6 +22,8 @@
 #ifndef _DEV_OL_DEFINES_H
 #define _DEV_OL_DEFINES_H
 
+#define OL_TXRX_PDEV_ID 0
+
 #define NORMALIZED_TO_NOISE_FLOOR (-96)
 
  /**
