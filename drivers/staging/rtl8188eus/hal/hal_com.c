@@ -2139,7 +2139,7 @@ u32 rtw_sec_read_cam(_adapter *adapter, u8 addr)
 	return rdata;
 }
 
-void rtw_sec_write_cam(_adapter *adapter, u8 addr, u32 wdata)
+void rtw_sec_write_cam_8188eus(_adapter *adapter, u8 addr, u32 wdata)
 {
 	_mutex *mutex = &adapter_to_dvobj(adapter)->cam_ctl.sec_cam_access_mutex;
 	u32 cnt = 0;
@@ -2267,7 +2267,7 @@ void rtw_sec_write_cam_ent(_adapter *adapter, u8 id, u16 ctrl, u8 *mac, u8 *key)
 
 		addr = (id << 3) + j;
 
-		rtw_sec_write_cam(adapter, addr, wdata);
+		rtw_sec_write_cam_8188eus(adapter, addr, wdata);
 	}
 }
 
@@ -2276,7 +2276,7 @@ void rtw_sec_clr_cam_ent(_adapter *adapter, u8 id)
 	u8 addr;
 
 	addr = (id << 3);
-	rtw_sec_write_cam(adapter, addr, 0);
+	rtw_sec_write_cam_8188eus(adapter, addr, 0);
 }
 
 bool rtw_sec_read_cam_is_gk(_adapter *adapter, u8 id)

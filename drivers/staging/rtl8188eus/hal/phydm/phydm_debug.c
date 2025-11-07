@@ -3469,7 +3469,7 @@ phydm_cmd(
 	} while (argc < MAX_ARGC);
 
 	if (argc == 1)
-		argv[0][strnlen(argv[0], sizeof argv) - 1] = '\0';
+		argv[0][strnlen(argv[0], sizeof(argv[0])) - 1] = '\0';
 
 	phydm_cmd_parser(dm, argv, argc, flag, output, out_len);
 

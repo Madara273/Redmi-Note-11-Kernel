@@ -9557,7 +9557,7 @@ int rtw_wiphy_register(struct wiphy *wiphy)
 	rtw_cfgvendor_attach(wiphy);
 #endif
 
-	rtw_regd_init(wiphy);
+	rtw_regd_init_8188eus(wiphy);
 
 	return wiphy_register(wiphy);
 }
