@@ -878,7 +878,7 @@ void usb_recv_tasklet(void *priv)
 				, rtw_is_drv_stopped(padapter) ? "True" : "False"
 				, rtw_is_surprise_removed(padapter) ? "True" : "False");
 			#ifdef CONFIG_PREALLOC_RX_SKB_BUFFER
-			if (rtw_free_skb_premem(pskb) != 0)
+			if (rtw_free_skb_premem_8188eus(pskb) != 0)
 			#endif /* CONFIG_PREALLOC_RX_SKB_BUFFER */
 				rtw_skb_free(pskb);
 			break;

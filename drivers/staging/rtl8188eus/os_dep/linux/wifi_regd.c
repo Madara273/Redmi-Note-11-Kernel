@@ -401,7 +401,7 @@ static struct country_code_to_enum_rd *_rtw_regd_find_country(u16 countrycode)
 	return NULL;
 }
 
-int rtw_regd_init(struct wiphy *wiphy)
+int rtw_regd_init_8188eus(struct wiphy *wiphy)
 {
 #if 0
 	if (rtw_regd == NULL) {

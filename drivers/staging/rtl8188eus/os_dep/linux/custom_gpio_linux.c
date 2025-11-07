@@ -301,8 +301,8 @@ void rtw_wifi_gpio_wlan_ctrl(int onoff)
 #ifdef CONFIG_GPIO_API
 /* this is a demo for extending GPIO pin[7] as interrupt mode */
 struct net_device *rtl_net;
-extern int rtw_register_gpio_interrupt(struct net_device *netdev, int gpio_num, void(*callback)(u8 level));
-extern int rtw_disable_gpio_interrupt(struct net_device *netdev, int gpio_num);
+extern int rtw_register_gpio_interrupt_8188eus(struct net_device *netdev, int gpio_num, void(*callback)(u8 level));
+extern int rtw_disable_gpio_interrupt_8188eus(struct net_device *netdev, int gpio_num);
 void gpio_int(u8 is_high)
 {
 	RTW_INFO("%s level=%d\n", __func__, is_high);
@@ -314,7 +314,7 @@ int register_net_gpio_init(void)
 		RTW_PRINT("rtl_net init fail!\n");
 		return -1;
 	}
-	return rtw_register_gpio_interrupt(rtl_net, 7, gpio_int);
+	return rtw_register_gpio_interrupt_8188eus(rtl_net, 7, gpio_int);
 }
 int unregister_net_gpio_init(void)
 {
@@ -323,7 +323,7 @@ int unregister_net_gpio_init(void)
 		RTW_PRINT("rtl_net init fail!\n");
 		return -1;
 	}
-	return rtw_disable_gpio_interrupt(rtl_net, 7);
+	return rtw_disable_gpio_interrupt_8188eus(rtl_net, 7);
 }
 #endif
 

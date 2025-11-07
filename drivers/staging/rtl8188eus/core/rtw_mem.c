@@ -30,19 +30,19 @@ struct u8	*rtw_get_buf_premem(int index)
 	return rtk_buf_mem[index];
 }
 
-u16 rtw_rtkm_get_buff_size(void)
+u16 rtw_rtkm_get_buff_size_8188eus(void)
 {
 	return MAX_RTKM_RECVBUF_SZ;
 }
-EXPORT_SYMBOL(rtw_rtkm_get_buff_size);
+EXPORT_SYMBOL(rtw_rtkm_get_buff_size_8188eus);
 
-u8 rtw_rtkm_get_nr_recv_skb(void)
+u8 rtw_rtkm_get_nr_recv_skb_8188eus(void)
 {
 	return MAX_RTKM_NR_PREALLOC_RECV_SKB;
 }
-EXPORT_SYMBOL(rtw_rtkm_get_nr_recv_skb);
+EXPORT_SYMBOL(rtw_rtkm_get_nr_recv_skb_8188eus);
 
-struct sk_buff *rtw_alloc_skb_premem(u16 in_size)
+struct sk_buff *rtw_alloc_skb_premem_8188eus(u16 in_size)
 {
 	struct sk_buff *skb = NULL;
 
@@ -58,9 +58,9 @@ struct sk_buff *rtw_alloc_skb_premem(u16 in_size)
 
 	return skb;
 }
-EXPORT_SYMBOL(rtw_alloc_skb_premem);
+EXPORT_SYMBOL(rtw_alloc_skb_premem_8188eus);
 
-int rtw_free_skb_premem(struct sk_buff *pskb)
+int rtw_free_skb_premem_8188eus(struct sk_buff *pskb)
 {
 	if (!pskb)
 		return -1;
@@ -74,7 +74,7 @@ int rtw_free_skb_premem(struct sk_buff *pskb)
 
 	return 0;
 }
-EXPORT_SYMBOL(rtw_free_skb_premem);
+EXPORT_SYMBOL(rtw_free_skb_premem_8188eus);
 
 static int __init rtw_mem_init(void)
 {
