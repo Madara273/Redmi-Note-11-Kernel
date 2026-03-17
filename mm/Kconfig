@@ -894,3 +894,14 @@ config OPLUS_MM_HACKS
 	  Tested on devices made by OEMs like Motorola and Samsung.
 
 	  If unsure, say "n".
+
+config MEMFD_ASHMEM_SHIM
+	bool "Memfd ashmem ioctl compatibility support"
+	depends on MEMFD_CREATE
+	help
+	  This provides compatibility support for ashmem ioctl commands against
+	  memfd file descriptors. This is useful for compatibility on Android
+	  for older applications that may use ashmem's ioctl commands on the
+	  now memfds passed to them.
+
+	  Unless you are running Android, say N.
