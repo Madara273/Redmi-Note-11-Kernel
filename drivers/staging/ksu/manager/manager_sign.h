@@ -1,0 +1,50 @@
+#ifndef __KSU_H_MANAGER_SIGN
+#define __KSU_H_MANAGER_SIGN
+
+#include <linux/types.h>
+
+// Madara273/KernelSU
+#define EXPECTED_SIZE_MADARA273 0x273
+#define EXPECTED_HASH_MADARA273							\
+	"9b2d5df97d24b3475ac701e5d6867620a7461c940822cfdb0bca797506906bfa"
+
+// rifsxd/KernelSU
+#define EXPECTED_SIZE_RIFSXD	0x3e6
+#define EXPECTED_HASH_RIFSXD							\
+	"79e590113c4c4c0c222978e413a5faa801666957b1212a328e46c00c69821bf7"
+
+// rsuntk/KernelSU
+#define EXPECTED_SIZE_RSUNTK	0x396
+#define EXPECTED_HASH_RSUNTK							\
+	"f415f4ed9435427e1fdf7f1fccd4dbc07b3d6b8751e4dbcec6f19671f427870b"
+
+// 5ec1cff/KernelSU
+#define EXPECTED_SIZE_5EC1CFF	384
+#define EXPECTED_HASH_5EC1CFF							\
+	"7e0c6d7278a3bb8e364e0fcba95afaf3666cf5ff3c245a3b63c8833bd0445cc4"
+
+// tiann/KernelSU
+#define EXPECTED_SIZE_OFFICIAL	0x033b
+#define EXPECTED_HASH_OFFICIAL							\
+	"c371061b19d8c7d7d6133c6a9bafe198fa944e50c1b31c9d8daa8d7f1fc2d2d6"
+
+// KOWX712/KernelSU
+#define EXPECTED_SIZE_KOWX712	0x375
+#define EXPECTED_HASH_KOWX712							\
+	"484fcba6e6c43b1fb09700633bf2fb4758f13cb0b2f4457b80d075084b26c588"
+
+typedef struct {
+	u32 size;
+	const char *sha256;
+} apk_sign_key_t;
+
+static const apk_sign_key_t authorized_keys[] = {
+	{ EXPECTED_SIZE_MADARA273,  EXPECTED_HASH_MADARA273 },
+	{ EXPECTED_SIZE_RIFSXD,     EXPECTED_HASH_RIFSXD    },
+	{ EXPECTED_SIZE_RSUNTK,     EXPECTED_HASH_RSUNTK    },
+	{ EXPECTED_SIZE_5EC1CFF,    EXPECTED_HASH_5EC1CFF   },
+	{ EXPECTED_SIZE_OFFICIAL,   EXPECTED_HASH_OFFICIAL  },
+	{ EXPECTED_SIZE_KOWX712,    EXPECTED_HASH_KOWX712   },
+};
+
+#endif /* MANAGER_SIGN_H */
