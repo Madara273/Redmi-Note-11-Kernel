@@ -1,0 +1,126 @@
+# KernelSU Objects
+kernelsu-y := core/init.o \
+		compat/kernel_compat.o feature/kernel_umount.o feature/sucompat.o \
+		hook/hook_manager.o hook/lsm_hooks.o hook/setuid_hook.o \
+		extras.o tiny_sulog.o \
+		infra/file_wrapper.o infra/seccomp_cache.o infra/su_mount_ns.o \
+		policy/allowlist.o policy/app_profile.o policy/feature.o \
+		runtime/boot_event.o runtime/ksud_integration.o \
+		selinux/selinux.o selinux/rules.o selinux/sepolicy.o \
+		supercall/dispatch.o supercall/perm.o supercall/supercall.o
+
+ifndef CONFIG_KSU_DISABLE_MANAGER
+kernelsu-y += manager/apk_sign.o manager/throne_tracker.o manager/pkg_observer.o
+endif
+
+obj-$(CONFIG_KSU) += kernelsu.o
+
+# Stealth & Customization
+KSU_MODULE_NAME ?= kernelsu
+ccflags-y += -DKSU_MODULE_NAME=\"$(KSU_MODULE_NAME)\"
+
+ifdef KBUILD_EXTMOD
+ifeq ($(CONFIG_KSU_DISABLE_MANAGER),y)
+ccflags-y += -DCONFIG_KSU_DISABLE_MANAGER=1
+endif
+ifeq ($(CONFIG_KSU_DISABLE_POLICY),y)
+ccflags-y += -DCONFIG_KSU_DISABLE_POLICY=1
+endif
+ifeq ($(CONFIG_KSU_DEBUG),y)
+ccflags-y += -DCONFIG_KSU_DEBUG=1
+endif
+endif
+
+# Include paths
+ccflags-y += \
+	-I$(srctree)/security/selinux \
+	-I$(srctree)/security/selinux/include \
+	-I$(objtree)/security/selinux \
+	-include $(srctree)/include/uapi/asm-generic/errno.h
+
+ifeq ($(filter /%,$(src)),)
+KSU_KERNEL_DIR := $(srctree)/$(src)
+else
+KSU_KERNEL_DIR := $(src)
+endif
+ccflags-y += -I$(KSU_KERNEL_DIR) -I$(KSU_KERNEL_DIR)/include
+
+# Versioning
+KSU_VERSION ?= 330130
+KSU_VERSION_TAG ?= v3.2.0
+
+ccflags-y += \
+	-DKSU_VERSION=$(KSU_VERSION) \
+	-DKSU_VERSION_TAG=\"$(KSU_VERSION_TAG)\"
+
+# Info version/tag
+_ksu_v := $(shell echo "-- KernelSU version: $(KSU_VERSION)" >&2)
+_ksu_t := $(shell echo "-- KernelSU tag: $(KSU_VERSION_TAG)" >&2)
+
+# KSU Manager Package
+ifdef KSU_MANAGER_PACKAGE
+ccflags-y += -DKSU_MANAGER_PACKAGE=\"$(KSU_MANAGER_PACKAGE)\"
+_ksu_p := $(shell echo "-- KernelSU Manager package: $(KSU_MANAGER_PACKAGE)" >&2)
+endif
+
+# Performance Tuning
+ccflags-y += -O3 -pipe -ftree-vectorize -fomit-frame-pointer -DNDEBUG -UDEBUG
+
+# Hook Modes
+ifeq ($(CONFIG_KSU_KPROBES_HOOK),y)
+_ksu_h := $(shell echo "-- Hook mode: Kprobes" >&2)
+ccflags-y += -DKSU_KPROBES_HOOK
+endif
+
+ifeq ($(CONFIG_KSU_MANUAL_HOOK),y)
+_ksu_h := $(shell echo "-- Hook mode: Manual" >&2)
+ccflags-y += -DKSU_MANUAL_HOOK
+endif
+
+ifeq ($(CONFIG_KSU_KPROBES_HOOK)$(CONFIG_KSU_MANUAL_HOOK),)
+$(error KernelSU: No hook mode selected!)
+endif
+
+# Kernel Compatibility / Auto-detect
+define ksu_check
+ccflags-y += $$(shell grep -qE $(1) $(2) 2>/dev/null && echo "-D$(3)")
+endef
+
+# SELinux drivers check
+$(eval $(call ksu_check,"current_sid",$(srctree)/security/selinux/include/objsec.h,KSU_COMPAT_HAS_CURRENT_SID))
+$(eval $(call ksu_check,"selinux_state",$(srctree)/security/selinux/include/security.h,KSU_COMPAT_USE_SELINUX_STATE))
+$(eval $(call ksu_check,"policy_rwlock",$(srctree)/security/selinux/ss/services.c,KSU_COMPAT_HAS_EXPORTED_POLICY_RWLOCK))
+
+# Optional backports
+$(eval $(call ksu_check,"strncpy_from_user_nofault",$(srctree)/include/linux/uaccess.h,KSU_OPTIONAL_STRNCPY))
+$(eval $(call ksu_check,"ssize_t[[:space:]]+kernel_read",$(srctree)/fs/read_write.c,KSU_OPTIONAL_KERNEL_READ))
+$(eval $(call ksu_check,"ssize_t[[:space:]]+kernel_write.*const[[:space:]]+void",$(srctree)/fs/read_write.c,KSU_OPTIONAL_KERNEL_WRITE))
+$(eval $(call ksu_check,"int[[:space:]]+path_mount",$(srctree)/fs/namespace.c,KSU_HAS_PATH_MOUNT))
+$(eval $(call ksu_check,"int[[:space:]]+path_umount",$(srctree)/fs/namespace.c,KSU_HAS_PATH_UMOUNT))
+
+# Seccomp
+ifneq ($(shell grep -wq put_seccomp_filter $(srctree)/kernel/seccomp.c $(srctree)/include/linux/seccomp.h 2>/dev/null && echo 1),1)
+$(eval $(call ksu_check,"seccomp_filter_release","$(srctree)/kernel/seccomp.c $(srctree)/include/linux/seccomp.h",KSU_OPTIONAL_SECCOMP_FILTER_RELEASE))
+endif
+
+# Security & Samsung
+$(eval $(call ksu_check,"security_inode_init_security_anon",$(srctree)/include/linux/security.h,KSU_COMPAT_HAS_INIT_SEC_ANON))
+$(eval $(call ksu_check,"CONFIG_KDP_CRED",$(srctree)/kernel/cred.c,SAMSUNG_UH_DRIVER_EXIST))
+$(eval $(call ksu_check,"SEC_SELINUX_PORTING_COMMON",$(srctree)/security/selinux/avc.c,SAMSUNG_SELINUX_PORTING))
+
+# Warning control
+ccflags-y += \
+	-Wno-strict-prototypes -Wno-int-conversion -Wno-missing-prototypes \
+	-Wno-declaration-after-statement -Wno-unused-function -Wno-unused-variable \
+	-Wno-unused-result -Wno-format-security
+
+## For susfs stuff ##
+ifeq ($(shell test -e $(srctree)/fs/susfs.c; echo $$?),0)
+$(eval SUSFS_VERSION=$(shell cat $(srctree)/include/linux/susfs.h | grep -E '^#define SUSFS_VERSION' | cut -d' ' -f3 | sed 's/"//g'))
+$(info )
+$(info -- SUSFS_VERSION: $(SUSFS_VERSION))
+ccflags-y += -DCONFIG_KSU_SUSFS
+else
+$(info -- You have not integrate susfs in your kernel.)
+$(info -- Read: https://gitlab.com/simonpunk/susfs4ksu)
+endif
