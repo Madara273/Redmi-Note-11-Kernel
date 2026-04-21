@@ -343,6 +343,10 @@ static int vep_dequeue(struct usb_ep *_ep, struct usb_request *_req)
 
 	ep = to_vep(_ep);
 	req = to_vrequest(_req);
+
+	if (!req || !req->udc)
+		return -EINVAL;
+
 	udc = req->udc;
 
 	if (!udc->driver)
