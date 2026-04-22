@@ -310,6 +310,7 @@ config QCOM_EARLY_RANDOM
 
 config QCOM_MEMORY_DUMP_V2
 	bool "QCOM Memory Dump V2 Support"
+	default n
 	help
 	  This enables memory dump feature. It allows various client
 	  subsystems to register respective dump regions. At the time
@@ -521,6 +522,7 @@ config QCOM_EUD
 config QCOM_MINIDUMP
 	bool "QCOM Minidump Support"
 	depends on QCOM_SMEM && POWER_RESET_QCOM
+	default n
 	help
 	  This enables minidump feature. It allows various clients to
 	  register to dump their state at system bad state (panic/WDT,etc.,).
