@@ -453,7 +453,7 @@ static int sc8551_enable_wdt(struct sc8551 *sc, bool enable)
 }
 EXPORT_SYMBOL_GPL(sc8551_enable_wdt);
 
-static int sc8551_set_wdt(struct sc8551 *sc, int ms)
+static int __maybe_unused sc8551_set_wdt(struct sc8551 *sc, int ms)
 {
 	int ret;
 	u8 val;
@@ -1051,7 +1051,7 @@ static int sc8551_set_alarm_int_mask(struct sc8551 *sc, u8 mask)
 }
 EXPORT_SYMBOL_GPL(sc8551_set_alarm_int_mask);
 
-static int sc8551_clear_alarm_int_mask(struct sc8551 *sc, u8 mask)
+static int __maybe_unused sc8551_clear_alarm_int_mask(struct sc8551 *sc, u8 mask)
 {
 	int ret;
 	u8 val;
@@ -1068,7 +1068,7 @@ static int sc8551_clear_alarm_int_mask(struct sc8551 *sc, u8 mask)
 }
 EXPORT_SYMBOL_GPL(sc8551_clear_alarm_int_mask);
 
-static int sc8551_set_fault_int_mask(struct sc8551 *sc, u8 mask)
+static int __maybe_unused sc8551_set_fault_int_mask(struct sc8551 *sc, u8 mask)
 {
 	int ret;
 	u8 val;
@@ -1085,7 +1085,7 @@ static int sc8551_set_fault_int_mask(struct sc8551 *sc, u8 mask)
 }
 EXPORT_SYMBOL_GPL(sc8551_set_fault_int_mask);
 
-static int sc8551_clear_fault_int_mask(struct sc8551 *sc, u8 mask)
+static int __maybe_unused sc8551_clear_fault_int_mask(struct sc8551 *sc, u8 mask)
 {
 	int ret;
 	u8 val;

@@ -207,7 +207,7 @@ static int bq2589x_disable_otg(struct bq2589x *bq)
 }
 EXPORT_SYMBOL_GPL(bq2589x_disable_otg);
 
-static int bq2589x_set_otg_volt(struct bq2589x *bq, int volt)
+static int __maybe_unused bq2589x_set_otg_volt(struct bq2589x *bq, int volt)
 {
 	u8 val = 0;
 
@@ -945,7 +945,7 @@ static int bq2589x_enable_ico(struct bq2589x* bq, bool enable)
 EXPORT_SYMBOL_GPL(bq2589x_enable_ico);
 
 
-static int bq2589x_read_idpm_limit(struct bq2589x *bq)
+static int __maybe_unused bq2589x_read_idpm_limit(struct bq2589x *bq)
 {
 	uint8_t val;
 	int curr;
