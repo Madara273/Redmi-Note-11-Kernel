@@ -433,6 +433,8 @@ config NETHUNTER_WIFI_DRIVERS_SUPPORT
 
 	select RTL8XXXU
 
+	select RTW88
+
 	select RTL8XXXU_UNTESTED
 
 	select WLAN_VENDOR_ZYDAS
@@ -457,11 +459,17 @@ config NETHUNTER_CAN_SUPPORT
 
 	select CAN
 
+	select CAN_ISOTP
+
+	select CAN_CAN327
+
 	select QTI_CAN
 
 	select CAN_VCAN
 
 	select CAN_VXCAN
+
+	select CAN_SLCAN
 
 	select CAN_GRCAN
 
