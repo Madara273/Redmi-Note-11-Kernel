@@ -321,7 +321,7 @@ config USB_CONFIGFS_NCM
 config USB_CONFIGFS_ECM
 	bool "Ethernet Control Model (CDC ECM)"
 	depends on USB_CONFIGFS
-	depends on NE
+	depends on NET
 	select USB_U_ETHER
 	select USB_F_ECM
 	default y
