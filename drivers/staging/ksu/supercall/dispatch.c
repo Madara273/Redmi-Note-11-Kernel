@@ -667,6 +667,27 @@ out:
 	return err;
 }
 
+// -------------------------------------------------------- //
+static int do_get_hook_mode(void __user *arg)
+{
+	struct ksu_get_hook_mode_cmd cmd = {0};
+
+#ifdef CONFIG_KSU_TAMPER_SYSCALL_TABLE
+	strscpy(cmd.mode, "Syscall Table", sizeof(cmd.mode));
+#elif defined(CONFIG_HAVE_SYSCALL_TRACEPOINTS)
+	strscpy(cmd.mode, "Tracepoint", sizeof(cmd.mode));
+#else
+	strscpy(cmd.mode, "Kprobes", sizeof(cmd.mode));
+#endif
+
+	if (copy_to_user(arg, &cmd, sizeof(cmd))) {
+		pr_err("get_hook_mode: copy_to_user failed\n");
+		return -EFAULT;
+	}
+
+	return 0;
+} // ------------------------------------------------------ //
+
 static int do_get_sulog_fd(void __user *arg)
 {
 	struct ksu_get_sulog_fd_cmd cmd;
@@ -689,6 +710,19 @@ static int do_disable_escape_to_root(void __user *arg)
 	set_thread_flag(TIF_KSU_DISABLE_ESCAPE_WITH_ROOT);
 	return 0;
 }
+
+// -------------------------------------------------------------- //
+static int do_get_version_tag(void __user *arg)
+{
+	struct ksu_get_version_tag_cmd cmd = {0};
+	strscpy(cmd.tag, KERNEL_SU_VERSION_TAG, sizeof(cmd.tag));
+	if (copy_to_user(arg, &cmd, sizeof(cmd))) {
+		pr_err("get_version_tag: copy_to_user failed\n");
+		return -EFAULT;
+	}
+
+	return 0;
+} // ------------------------------------------------------------ //
 
 // IOCTL handlers mapping table
 static const struct ksu_ioctl_cmd_map ksu_ioctl_handlers[] = {
@@ -716,6 +750,9 @@ static const struct ksu_ioctl_cmd_map ksu_ioctl_handlers[] = {
 	{ .cmd = KSU_IOCTL_SET_INIT_PGRP, .name = "SET_INIT_PGRP", .handler = do_set_init_pgrp, .perm_check = only_root },
 	{ .cmd = KSU_IOCTL_GET_SULOG_FD, .name = "GET_SULOG_FD", .handler = do_get_sulog_fd, .perm_check = only_root },
 	{ .cmd = KSU_IOCTL_DISABLE_ESCAPE_TO_ROOT, .name = "DISABLE_ESCAPE_TO_ROOT", .handler = do_disable_escape_to_root, .perm_check = only_root },
+	{ .cmd = KSU_IOCTL_GET_HOOK_MODE, .name = "GET_HOOK_MODE", .handler = do_get_hook_mode, .perm_check = manager_or_root },
+	{ .cmd = KSU_IOCTL_GET_VERSION_TAG, .name = "GET_VERSION_TAG", .handler = do_get_version_tag, .perm_check = always_allow },
+
 	{ .cmd = 0, .name = NULL, .handler = NULL, .perm_check = NULL } // Sentinel
 };
 
