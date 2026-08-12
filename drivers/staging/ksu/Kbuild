@@ -19,7 +19,7 @@ MDIR := $(realpath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
 # Versioning (Next-style з фолбеком на твою 33190)
 KSU_VERSION ?= 33214
-KSU_VERSION_TAG ?= v3.2.5-11
+KSU_VERSION_TAG ?= v3.3.0
 
 ccflags-y += \
 	-DKSU_VERSION=$(KSU_VERSION) \
